@@ -8,6 +8,7 @@ import tempfile
 import chapter3
 import chapter4
 import chapter9
+import os
 
 # ============ CẤU HÌNH WEBRTC =============
 RTC_CONFIGURATION = RTCConfiguration({
@@ -102,6 +103,25 @@ if chapter3_task != st.session_state.chapter3_task:
         st.session_state.face_task = "Chọn tác vụ"  # Đặt lại Nhận dạng khuôn mặt
         st.session_state.chapter4_task = "Chọn tác vụ"  # Đặt lại Chapter 4
         st.session_state.chapter9_task = "Chọn tác vụ"  # Đặt lại Chapter 9
+        st.rerun()
+
+# Ánh xạ tác vụ Chapter 3 tới file ảnh
+chapter3_image_map = {
+    "Negative": "3.1.tif",
+    "NegativeColor": "3.12.tif",
+    "Logarit": "3.2.tif",
+    "Power": "3.3.tif",
+    "PiecewisetLine": "3.5.jpg",
+    "Histogram": "3.6.tif",
+    "Hist_equal": "3.7.tif",
+    "HistEqualColor": "3.8.tif",
+    "LocalHist": "3.9.tif",
+    "HistStat": "3.10.tif",
+    "Sharpening": "3.11.tif",
+    "SharpeningMask": "3.12.tif",
+    "Gradient": "3.13.tif" 
+}
+image_folder = "PictureForChapter3"  # Thư mục chứa ảnh
 
 # ============ COMBOBOX XỬ LÝ ẢNH CHAPTER 4 =============
 st.sidebar.header("🖼️ Xử lý ảnh Chapter 4")
@@ -163,21 +183,35 @@ if st.session_state.chapter3_task != "Chọn tác vụ":
     # Hiển thị giao diện Xử lý ảnh Chapter 3
     st.header("🖼️ Xử lý ảnh số - Chapter 3")
 
-    uploaded_image = st.file_uploader(
-        "📤 Tải lên ảnh để xử lý",
-        type=["jpg", "jpeg", "png", "tif"],
-        help="Hỗ trợ ảnh JPG, PNG, TIFF",
-        key="chapter3_uploader"
-    )
+    # Checkbox để chọn giữa ảnh mặc định và upload thủ công
+    use_default_image = st.checkbox("Sử dụng ảnh mặc định", value=True, key="chapter3_default_image")
 
-    if uploaded_image is not None:
-        # Đọc ảnh
-        file_bytes = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
-        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR if st.session_state.chapter3_task in ["NegativeColor", "HistEqualColor"] else cv2.IMREAD_GRAYSCALE)
+    if use_default_image:
+        # Tải ảnh mặc định từ thư mục
+        image_path = os.path.join(image_folder, chapter3_image_map[st.session_state.chapter3_task])
+        try:
+            img = cv2.imread(image_path, cv2.IMREAD_COLOR if st.session_state.chapter3_task in ["NegativeColor", "HistEqualColor"] else cv2.IMREAD_GRAYSCALE)
+            if img is None:
+                raise FileNotFoundError(f"Không tìm thấy file ảnh: {image_path}")
+        except Exception as e:
+            st.error(f"Lỗi khi tải ảnh mặc định: {str(e)}")
+            st.warning(f"Vui lòng kiểm tra file {image_path} trong thư mục {image_folder}.")
+            img = None
+    else:
+        # Tùy chọn upload ảnh thủ công
+        uploaded_image = st.file_uploader(
+            "📤 Tải lên ảnh để xử lý",
+            type=["jpg", "jpeg", "png", "tif"],
+            help="Hỗ trợ ảnh JPG, PNG, TIFF",
+            key="chapter3_uploader"
+        )
+        if uploaded_image is not None:
+            file_bytes = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
+            img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR if st.session_state.chapter3_task in ["NegativeColor", "HistEqualColor"] else cv2.IMREAD_GRAYSCALE)
+        else:
+            img = None
 
-        # Hiển thị ảnh gốc
-        st.image(img, caption="Ảnh gốc", use_column_width=True)
-
+    if img is not None:
         # Xử lý ảnh
         try:
             processed_img = getattr(chapter3, st.session_state.chapter3_task)(img)
@@ -221,9 +255,6 @@ elif st.session_state.chapter4_task != "Chọn tác vụ":
         file_bytes = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
         img = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)  # Chapter 4 yêu cầu ảnh xám
 
-        # Hiển thị ảnh gốc
-        st.image(img, caption="Ảnh gốc", use_column_width=True)
-
         # Xử lý ảnh
         try:
             processed_img = getattr(chapter4, st.session_state.chapter4_task)(img)
@@ -266,9 +297,6 @@ elif st.session_state.chapter9_task != "Chọn tác vụ":
         # Đọc ảnh
         file_bytes = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
         img = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)  # Chapter 9 yêu cầu ảnh xám
-
-        # Hiển thị ảnh gốc
-        st.image(img, caption="Ảnh gốc", use_column_width=True)
 
         # Xử lý ảnh
         try:
