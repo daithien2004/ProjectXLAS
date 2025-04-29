@@ -1,20 +1,47 @@
 import numpy as np
 import cv2
 L = 256
+# def Spectrum(imgin):
+#     # Không cần mở rộng ảnh có kích thước PxQ
+#     f = imgin.astype(np.float32)
+
+#     # Bước 1
+#     F = np.fft.fft2(f)
+
+#     # Bước 2
+#     F = np.fft.fftshift(F)
+
+#     S = np.sqrt(F.real**2 + F.imag**2)
+#     S = np.clip(S,0,L-1)
+#     imgout = S.astype(np.uint8)
+#     return imgout
+
+import numpy as np
+
 def Spectrum(imgin):
-    # Không cần mở rộng ảnh có kích thước PxQ
+    if len(imgin.shape) > 2 or imgin.dtype != np.uint8:
+        raise ValueError("Đầu vào phải là ảnh xám (np.uint8)")
+    
+    # Bước 1: Chuyển sang float32
     f = imgin.astype(np.float32)
-
-    # Bước 1
+    
+    # Bước 2: Tính FFT 2D
     F = np.fft.fft2(f)
+    F_shifted = np.fft.fftshift(F)
 
-    # Bước 2
-    F = np.fft.fftshift(F)
+    # Bước 3: Lấy độ lớn phổ (magnitude spectrum)
+    magnitude = np.abs(F_shifted)
 
-    S = np.sqrt(F.real**2 + F.imag**2)
-    S = np.clip(S,0,L-1)
-    imgout = S.astype(np.uint8)
-    return imgout
+    # Bước 4: Dùng log để nén giá trị (có cộng epsilon để tránh log(0))
+    epsilon = 1e-8
+    log_magnitude = np.log(1 + magnitude + epsilon)
+
+    # Bước 5: Chuẩn hóa về khoảng 0-255
+    log_magnitude_normalized = (log_magnitude - log_magnitude.min()) / (log_magnitude.max() - log_magnitude.min())
+    spectrum_img = (log_magnitude_normalized * 255).astype(np.uint8)
+    
+    return spectrum_img
+
 
 def CreateMoireFilter(M, N):
     H = np.ones((M,N), np.complex64)

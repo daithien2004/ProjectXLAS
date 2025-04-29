@@ -151,7 +151,7 @@ if chapter4_task != st.session_state.chapter4_task:
         st.session_state.face_task = "Chọn tác vụ"  # Đặt lại Nhận dạng khuôn mặt
         st.session_state.chapter3_task = "Chọn tác vụ"  # Đặt lại Chapter 3
         st.session_state.chapter9_task = "Chọn tác vụ"  # Đặt lại Chapter 9
-
+        st.rerun()
 # ============ COMBOBOX XỬ LÝ ẢNH CHAPTER 9 =============
 st.sidebar.header("🖼️ Xử lý ảnh Chapter 9")
 chapter9_functions = {
@@ -176,7 +176,21 @@ if chapter9_task != st.session_state.chapter9_task:
         st.session_state.face_task = "Chọn tác vụ"  # Đặt lại Nhận dạng khuôn mặt
         st.session_state.chapter3_task = "Chọn tác vụ"  # Đặt lại Chapter 3
         st.session_state.chapter4_task = "Chọn tác vụ"  # Đặt lại Chapter 4
+        st.rerun()
 
+chapter9_image_map = {
+    "Erosion": "PictureForChapter9/9.1.tif",
+    "Dilation": "PictureForChapter9/9.2.tif",
+    "Boundary": "PictureForChapter9/9.3.tif",
+    "Counter": "PictureForChapter9/9.4.tif"
+}
+chapter9_image_descriptions = {
+    "Erosion": "Ảnh nhị phân với vùng sáng rõ (ví dụ: văn bản, hình khối).",
+    "Dilation": "Ảnh nhị phân tương tự, để thấy hiệu quả giãn nở.",
+    "Boundary": "Ảnh nhị phân với vùng sáng có biên rõ (ví dụ: hình tròn, hình vuông).",
+    "Counter": "Ảnh nhị phân với nhiều đối tượng (để vẽ nhiều đường viền)."
+}
+image_folder_ch9 = "PictureForChapter9"
 # ============ LOGIC XỬ LÝ =============
 # Hiển thị giao diện dựa trên tác vụ được chọn
 if st.session_state.chapter3_task != "Chọn tác vụ":
@@ -286,18 +300,39 @@ elif st.session_state.chapter9_task != "Chọn tác vụ":
     # Hiển thị giao diện Xử lý ảnh Chapter 9
     st.header("🖼️ Xử lý ảnh số - Chapter 9")
 
-    uploaded_image = st.file_uploader(
-        "📤 Tải lên ảnh để xử lý",
-        type=["jpg", "jpeg", "png", "tif"],
-        help="Hỗ trợ ảnh JPG, PNG, TIFF (ảnh nhị phân hoặc xám được khuyến nghị)",
-        key="chapter9_uploader"
-    )
+    # Hiển thị mô tả loại ảnh khuyến nghị
+    image_description = chapter9_image_descriptions.get(st.session_state.chapter9_task, "Không có mô tả.")
+    st.write(f"**Loại ảnh khuyến nghị**: {image_description}")
 
-    if uploaded_image is not None:
-        # Đọc ảnh
-        file_bytes = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
-        img = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)  # Chapter 9 yêu cầu ảnh xám
+    # Checkbox để chọn giữa ảnh mặc định và upload thủ công
+    use_default_image = st.checkbox("Sử dụng ảnh mặc định", value=True, key="chapter9_default_image")
 
+    if use_default_image:
+        # Tải ảnh mặc định từ thư mục
+        image_path = chapter9_image_map[st.session_state.chapter9_task]
+        try:
+            img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+            if img is None:
+                raise FileNotFoundError(f"Không tìm thấy file ảnh: {image_path}")
+        except Exception as e:
+            st.error(f"Lỗi khi tải ảnh mặc định: {str(e)}")
+            st.warning(f"Vui lòng kiểm tra file {image_path} trong thư mục {image_folder_ch9}.")
+            img = None
+    else:
+        # Tùy chọn upload ảnh thủ công
+        uploaded_image = st.file_uploader(
+            "📤 Tải lên ảnh để xử lý",
+            type=["jpg", "jpeg", "png", "tif"],
+            help="Hỗ trợ ảnh JPG, PNG, TIFF (ảnh nhị phân hoặc xám được khuyến nghị)",
+            key="chapter9_uploader"
+        )
+        if uploaded_image is not None:
+            file_bytes = np.asarray(bytearray(uploaded_image.read()), dtype=np.uint8)
+            img = cv2.imdecode(file_bytes, cv2.IMREAD_GRAYSCALE)  # Chapter 9 yêu cầu ảnh xám
+        else:
+            img = None
+
+    if img is not None:
         # Xử lý ảnh
         try:
             processed_img = getattr(chapter9, st.session_state.chapter9_task)(img)
