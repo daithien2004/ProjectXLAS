@@ -19,6 +19,8 @@ def setup_sidebar():
     st.sidebar.title("👨‍🎓 Thông tin sinh viên")
     st.sidebar.markdown("**Họ tên:** Quảng Đại Thiện")
     st.sidebar.markdown("**MSSV:** 22110426")
+    st.sidebar.markdown("**Họ tên:** Nguyễn Lý Hùng")
+    st.sidebar.markdown("**MSSV:** 22110337")
     st.sidebar.markdown("---")
 
     # Khởi tạo session state

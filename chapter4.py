@@ -98,7 +98,7 @@ def CreateMoireFilter(M, N):
                 H.real[u,v] = 0.0
     return H
 
-def DrawInferenceFilter(imgin):
+# def DrawInferenceFilter(imgin):
     M, N = imgin.shape
     # Bước 1
     P = cv2.getOptimalDFTSize(M)
@@ -108,7 +108,29 @@ def DrawInferenceFilter(imgin):
     HR = HR*(L-1)
     imgout = HR.astype(np.uint8)
     return imgout
+def DrawInferenceFilter(imgin):
+    if len(imgin.shape) > 2:
+        raise ValueError("Ảnh đầu vào phải là ảnh grayscale (2D), không phải ảnh màu (3D)")
 
+    M, N = imgin.shape
+    H = CreateInferenceFilter(M, N)  # H là mảng 2D kiểu complex64, kích thước (M, N)
+
+    # Dịch chuyển phổ tần số về tâm
+    H_shifted = np.fft.fftshift(H)
+
+    # Tính độ lớn của H (magnitude spectrum)
+    S = np.sqrt(H_shifted.real**2 + H_shifted.imag**2)
+    
+    # Chuẩn hóa tuyến tính về dải [0, 255]
+    S_min, S_max = S.min(), S.max()
+    if S_max > S_min:  # Tránh chia cho 0
+        S = (S - S_min) / (S_max - S_min) * 255
+    else:
+        S = S * 255  # Nếu S_max == S_min, chỉ nhân với 255
+
+    # Chuyển thành ảnh grayscale
+    imgout = S.astype(np.uint8)
+    return imgout
 def CreateInferenceFilter(M,N):
     H = np.ones((M,N), np.complex64)
     H.imag = 0.0
@@ -134,7 +156,7 @@ def RemoveInterference(imgin):
     imgout = FrequencyFiltering(imgin, H)
     return imgout
 
-def RemoveMoireSimple(imgin):
+# def RemoveMoireSimple(imgin):
     M, N = imgin.shape
     # Bước 1
     P = cv2.getOptimalDFTSize(M)
@@ -167,7 +189,51 @@ def RemoveMoireSimple(imgin):
     imgout = gR.astype(np.uint8)
     return imgout
 
+def RemoveMoireSimple(imgin):
+    M, N = imgin.shape
+    P = cv2.getOptimalDFTSize(M)
+    Q = cv2.getOptimalDFTSize(N)
+    fp = np.zeros((P, Q), np.float32)
+    fp[:M,:N] = 1.0 * imgin
 
+    for x in range(0, M):
+        for y in range(0, N):
+            if (x + y) % 2 == 1:
+                fp[x, y] = -fp[x, y]
+
+    # Bước 4: Biến đổi DFT
+    F = cv2.dft(fp, flags=cv2.DFT_COMPLEX_OUTPUT)
+    
+    # Dịch chuyển phổ tần số về tâm
+    F_shifted = np.zeros_like(F)
+    F_shifted[:, :, 0] = np.fft.fftshift(F[:, :, 0])
+    F_shifted[:, :, 1] = np.fft.fftshift(F[:, :, 1])
+
+    # Tạo bộ lọc H
+    H = CreateMoireFilter(P, Q)
+    H_real = H.real.astype(np.float32)
+    H_imag = H.imag.astype(np.float32)
+    H_cv = cv2.merge((H_real, H_imag))
+    
+    # Nhân phổ tần số với bộ lọc
+    G = cv2.mulSpectrums(F_shifted, H_cv, flags=cv2.DFT_ROWS)
+    
+    # Dịch ngược phổ tần số
+    G_shifted = np.zeros_like(G)
+    G_shifted[:, :, 0] = np.fft.ifftshift(G[:, :, 0])
+    G_shifted[:, :, 1] = np.fft.ifftshift(G[:, :, 1])
+    
+    # Biến đổi ngược IDFT
+    g = cv2.idft(G_shifted, flags=cv2.DFT_SCALE)
+    
+    gR = g[:M, :N, 0]
+    for x in range(0, M):
+        for y in range(0, N):
+            if (x + y) % 2 == 1:
+                gR[x, y] = -gR[x, y]
+    gR = np.clip(gR, 0, L-1)
+    imgout = gR.astype(np.uint8)
+    return imgout
 def RemoveInferenceFilter(imgin):
     M, N = imgin.shape
     # Bước 1
@@ -231,8 +297,8 @@ def CreateMotionFilter(M,N):
     phi_prev = 0.0
     for u in range(0,M):
         for v in range (0,N):
-            phi = np.pi*((u-M//2)*a) + ((v-N//2)*b)
-
+            # phi = np.pi*((u-M//2)*a) + ((v-N//2)*b)
+            phi = np.pi * ((u - M//2) * a + (v - N//2) * b)
             if abs(phi) < 1.0e-6:
                 phi = phi_prev
 

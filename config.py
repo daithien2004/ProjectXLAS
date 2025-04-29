@@ -69,7 +69,27 @@ CHAPTER4_FUNCTIONS = {
     "CreateMotion": "Tạo hiệu ứng chuyển động",
     "CreateDemotion": "Khử hiệu ứng chuyển động"
 }
-
+# Ánh xạ tác vụ và file ảnh cho Chapter 4
+CHAPTER4_IMAGE_MAP = {
+    "Spectrum": "4_spectrum.tif",
+    "RemoveMoire": "4_moire.tif",
+    "RemoveInterference": "4_interference.tif",
+    "RemoveMoireSimple": "4_moire_simple.tif",
+    "RemoveInferenceFilter": "4_moire_simple.tif",
+    "DrawInferenceFilter": "4_DrawInferenceFilter.tif",
+    "CreateMotion": "4_creat_moire.tif",
+    "CreateDemotion": "4_demotion.tif"
+}
+CHAPTER4_IMAGE_DESCRIPTIONS = {
+    "Spectrum": "Ảnh xám có họa tiết lặp lại (ví dụ: lưới ô vuông hoặc đường kẻ).",
+    "RemoveMoire": "Ảnh xám có nhiễu Moire (ví dụ: ảnh quét từ báo chí hoặc màn hình CRT).",
+    "RemoveInterference": "Ảnh xám có nhiễu giao thoa dạng đường thẳng (ví dụ: đường kẻ ngang/dọc).",
+    "RemoveMoireSimple": "Ảnh xám có nhiễu Moire nhẹ (ví dụ: ảnh quét từ sách hoặc báo).",
+    "RemoveInferenceFilter": "Ảnh xám có nhiễu giao thoa dạng đường thẳng (tương tự RemoveInterference).",
+    "DrawInferenceFilter": "Ảnh xám có nhiễu giao thoa để liên hệ với bộ lọc.",
+    "CreateMotion": "Ảnh xám có chi tiết rõ ràng (ví dụ: văn bản hoặc hình khối).",
+    "CreateDemotion": "Ảnh xám đã bị làm mờ bởi hiệu ứng chuyển động (ví dụ: đầu ra từ CreateMotion)."
+}
 # Ánh xạ tác vụ và file ảnh cho Chapter 9
 CHAPTER9_IMAGE_MAP = {
     "Erosion": "9.1.tif",
@@ -112,5 +132,6 @@ FRUIT_COLORS = {
 
 # Các hằng số khác
 IMAGE_FOLDER_CH3 = "PictureForChapter3"
+IMAGE_FOLDER_CH4 = "PictureForChapter4"
 IMAGE_FOLDER_CH9 = "PictureForChapter9"
 FACE_OPTIONS = ["Chọn tác vụ", "Nhận dạng từ Webcam", "Nhận dạng từ video mẫu", "Nhận dạng từ video upload"]

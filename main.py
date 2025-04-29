@@ -1,8 +1,9 @@
 import streamlit as st
 from config import (
-    RTC_CONFIGURATION, CHAPTER3_IMAGE_MAP, CHAPTER3_FUNCTIONS,
-    CHAPTER4_FUNCTIONS, CHAPTER9_IMAGE_MAP, CHAPTER9_FUNCTIONS,
-    CHAPTER9_IMAGE_DESCRIPTIONS, IMAGE_FOLDER_CH3, IMAGE_FOLDER_CH9
+    RTC_CONFIGURATION, CHAPTER3_IMAGE_MAP, CHAPTER3_FUNCTIONS, IMAGE_FOLDER_CH3,
+    CHAPTER4_IMAGE_MAP, CHAPTER4_FUNCTIONS, CHAPTER4_IMAGE_DESCRIPTIONS,IMAGE_FOLDER_CH4,
+    CHAPTER9_IMAGE_MAP, CHAPTER9_FUNCTIONS,
+    CHAPTER9_IMAGE_DESCRIPTIONS, IMAGE_FOLDER_CH9
 )
 from ui import setup_sidebar, display_image_processing_ui
 from face_recognition import FaceRecognizer
@@ -56,10 +57,11 @@ def main():
         display_image_processing_ui(
             chapter="Chapter 4",
             task=sub_task,
-            image_map={},
+            image_map=CHAPTER4_IMAGE_MAP,
             functions=CHAPTER4_FUNCTIONS,
-            image_folder=None,
-            session_key="chapter4"
+            image_folder=IMAGE_FOLDER_CH4,
+            session_key="chapter4",
+            image_descriptions=CHAPTER4_IMAGE_DESCRIPTIONS
         )
 
     elif main_task == "Xử lý ảnh Chapter 9" and sub_task != "Chọn tác vụ":
