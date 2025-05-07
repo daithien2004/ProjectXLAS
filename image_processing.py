@@ -5,7 +5,7 @@ from chapter3 import (
 )
 from chapter4 import (
     Spectrum, RemoveMoire, RemoveInterference, RemoveMoireSimple,
-    RemoveInferenceFilter, DrawInferenceFilter, CreateMotion, CreateDemotion
+    RemoveInferenceFilter, DrawInferenceFilter, CreateMotion, CreateDemotion,CreateDemotionNoise
 )
 from chapter9 import Erosion, Dilation, Boundary, Counter
 

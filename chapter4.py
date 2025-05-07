@@ -1,46 +1,58 @@
 import numpy as np
 import cv2
 L = 256
-# def Spectrum(imgin):
-#     # Không cần mở rộng ảnh có kích thước PxQ
-#     f = imgin.astype(np.float32)
-
-#     # Bước 1
-#     F = np.fft.fft2(f)
-
-#     # Bước 2
-#     F = np.fft.fftshift(F)
-
-#     S = np.sqrt(F.real**2 + F.imag**2)
-#     S = np.clip(S,0,L-1)
-#     imgout = S.astype(np.uint8)
-#     return imgout
-
-import numpy as np
-
 def Spectrum(imgin):
-    if len(imgin.shape) > 2 or imgin.dtype != np.uint8:
-        raise ValueError("Đầu vào phải là ảnh xám (np.uint8)")
+    M, N = imgin.shape
+    P = cv2.getOptimalDFTSize(M)
+    Q = cv2.getOptimalDFTSize(N)
     
-    # Bước 1: Chuyển sang float32
-    f = imgin.astype(np.float32)
+    # Bước 1 và 2: 
+    # Tạo ảnh mới có kích thước PxQ
+    # và thêm số 0 và phần mở rộng
+    fp = np.zeros((P,Q), np.float32)
+    fp[:M,:N] = imgin
+    fp = fp/(L-1)
+
+    # Bước 3:
+    # Nhân (-1)^(x+y) để dời vào tâm ảnh
+    for x in range(0, M):
+        for y in range(0, N):
+            if (x+y) % 2 == 1:
+                fp[x,y] = -fp[x,y]
+
+    # Bước 4:
+    # Tính DFT    
+    F = cv2.dft(fp, flags = cv2.DFT_COMPLEX_OUTPUT)
+
+    # Tính spectrum
+    S = np.sqrt(F[:,:,0]**2 + F[:,:,1]**2)
+    S = np.clip(S, 0, L-1)
+    imgout = S.astype(np.uint8)
+    return imgout
+
+# def Spectrum(imgin):
+#     if len(imgin.shape) > 2 or imgin.dtype != np.uint8:
+#         raise ValueError("Đầu vào phải là ảnh xám (np.uint8)")
     
-    # Bước 2: Tính FFT 2D
-    F = np.fft.fft2(f)
-    F_shifted = np.fft.fftshift(F)
-
-    # Bước 3: Lấy độ lớn phổ (magnitude spectrum)
-    magnitude = np.abs(F_shifted)
-
-    # Bước 4: Dùng log để nén giá trị (có cộng epsilon để tránh log(0))
-    epsilon = 1e-8
-    log_magnitude = np.log(1 + magnitude + epsilon)
-
-    # Bước 5: Chuẩn hóa về khoảng 0-255
-    log_magnitude_normalized = (log_magnitude - log_magnitude.min()) / (log_magnitude.max() - log_magnitude.min())
-    spectrum_img = (log_magnitude_normalized * 255).astype(np.uint8)
+#     # Bước 1: Chuyển sang float32
+#     f = imgin.astype(np.float32)
     
-    return spectrum_img
+#     # Bước 2: Tính FFT 2D
+#     F = np.fft.fft2(f)
+#     F_shifted = np.fft.fftshift(F)
+
+#     # Bước 3: Lấy độ lớn phổ (magnitude spectrum)
+#     magnitude = np.abs(F_shifted)
+
+#     # Bước 4: Dùng log để nén giá trị (có cộng epsilon để tránh log(0))
+#     epsilon = 1e-8
+#     log_magnitude = np.log(1 + magnitude + epsilon)
+
+#     # Bước 5: Chuẩn hóa về khoảng 0-255
+#     log_magnitude_normalized = (log_magnitude - log_magnitude.min()) / (log_magnitude.max() - log_magnitude.min())
+#     spectrum_img = (log_magnitude_normalized * 255).astype(np.uint8)
+    
+#     return spectrum_img
 
 
 def CreateMoireFilter(M, N):
@@ -97,6 +109,7 @@ def CreateMoireFilter(M, N):
             if Duv <= D0:
                 H.real[u,v] = 0.0
     return H
+
 
 # def DrawInferenceFilter(imgin):
     M, N = imgin.shape
@@ -234,38 +247,38 @@ def RemoveMoireSimple(imgin):
     gR = np.clip(gR, 0, L-1)
     imgout = gR.astype(np.uint8)
     return imgout
-def RemoveInferenceFilter(imgin):
-    M, N = imgin.shape
-    # Bước 1
-    P = cv2.getOptimalDFTSize(M)
-    Q = cv2.getOptimalDFTSize(N)
-    fp = np.zeros((P, Q), np.float32)
-    # Bước 2
-    fp[:M,:N] = 1.0*imgin
+# def RemoveInferenceFilter(imgin):
+#     M, N = imgin.shape
+#     # Bước 1
+#     P = cv2.getOptimalDFTSize(M)
+#     Q = cv2.getOptimalDFTSize(N)
+#     fp = np.zeros((P, Q), np.float32)
+#     # Bước 2
+#     fp[:M,:N] = 1.0*imgin
 
-    # Bước 3
-    for x in range(0,M):
-        for y in range(0,N):
-            if(x+y) % 2 == 1:
-                fp[x,y] = -fp[x,y]
-    # Bước 4
-    F = cv2.dft(fp, flags=cv2.DFT_COMPLEX_OUTPUT)
-    # Bước 5: Tạo bộ lọc H
-    H = CreateInferenceFilter(P, Q)
-    # Bước 6: G = F*H
-    G = cv2.mulSpectrums(F, H, flags=cv2.DFT_ROWS)
+#     # Bước 3
+#     for x in range(0,M):
+#         for y in range(0,N):
+#             if(x+y) % 2 == 1:
+#                 fp[x,y] = -fp[x,y]
+#     # Bước 4
+#     F = cv2.dft(fp, flags=cv2.DFT_COMPLEX_OUTPUT)
+#     # Bước 5: Tạo bộ lọc H
+#     H = CreateInferenceFilter(P, Q)
+#     # Bước 6: G = F*H
+#     G = cv2.mulSpectrums(F, H, flags=cv2.DFT_ROWS)
 
-    # Bước 7: IDFT
-    g = cv2.idft(G,flags=cv2.DFT_SCALE)
-    # Bước 8: 
-    gR = g[:M,:N,0]
-    for x in range(0,M):
-        for y in range(0,N):
-            if(x+y) % 2 == 1:
-                gR[x,y] = -gR[x,y]
-    gR = np.clip(gR,0,L-1)
-    imgout = gR.astype(np.uint8)
-    return imgout
+#     # Bước 7: IDFT
+#     g = cv2.idft(G,flags=cv2.DFT_SCALE)
+#     # Bước 8: 
+#     gR = g[:M,:N,0]
+#     for x in range(0,M):
+#         for y in range(0,N):
+#             if(x+y) % 2 == 1:
+#                 gR[x,y] = -gR[x,y]
+#     gR = np.clip(gR,0,L-1)
+#     imgout = gR.astype(np.uint8)
+#     return imgout
 
 def FrequencyFiltering(imgin, H):
     # Không cần mở rộng ảnh có kích thước PxQ
@@ -297,8 +310,8 @@ def CreateMotionFilter(M,N):
     phi_prev = 0.0
     for u in range(0,M):
         for v in range (0,N):
-            # phi = np.pi*((u-M//2)*a) + ((v-N//2)*b)
-            phi = np.pi * ((u - M//2) * a + (v - N//2) * b)
+            phi = np.pi*((u-M//2)*a) + ((v-N//2)*b)
+
             if abs(phi) < 1.0e-6:
                 phi = phi_prev
 
@@ -340,4 +353,11 @@ def CreateDemotion(imgin):
     M,N = imgin.shape
     H = CreateDemotionFilter(M,N)
     imgout = FrequencyFiltering(imgin, H)
+    return imgout
+
+def CreateDemotionNoise(imgin):
+    M, N = imgin.shape
+    H = CreateDemotionFilter(M, N)
+    img_demotion = FrequencyFiltering(imgin, H)
+    imgout = cv2.medianBlur(img_demotion, 5)
     return imgout

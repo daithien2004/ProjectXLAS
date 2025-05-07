@@ -67,7 +67,8 @@ CHAPTER4_FUNCTIONS = {
     "RemoveInferenceFilter": "Loại bỏ nhiễu giao thoa (bộ lọc)",
     "DrawInferenceFilter": "Vẽ bộ lọc giao thoa",
     "CreateMotion": "Tạo hiệu ứng chuyển động",
-    "CreateDemotion": "Khử hiệu ứng chuyển động"
+    "CreateDemotion": "Khử hiệu ứng chuyển động",
+    "CreateDemotionNoise": "Khử nhiễu chuyển động và làm mịn"
 }
 # Ánh xạ tác vụ và file ảnh cho Chapter 4
 CHAPTER4_IMAGE_MAP = {
@@ -78,7 +79,8 @@ CHAPTER4_IMAGE_MAP = {
     "RemoveInferenceFilter": "4_moire_simple.tif",
     "DrawInferenceFilter": "4_DrawInferenceFilter.tif",
     "CreateMotion": "4_creat_moire.tif",
-    "CreateDemotion": "4_demotion.tif"
+    "CreateDemotion": "4_demotion.tif",
+    "CreateDemotionNoise": "4_text_motion_noisy.tif"
 }
 CHAPTER4_IMAGE_DESCRIPTIONS = {
     "Spectrum": "Ảnh xám có họa tiết lặp lại (ví dụ: lưới ô vuông hoặc đường kẻ).",
@@ -88,7 +90,8 @@ CHAPTER4_IMAGE_DESCRIPTIONS = {
     "RemoveInferenceFilter": "Ảnh xám có nhiễu giao thoa dạng đường thẳng (tương tự RemoveInterference).",
     "DrawInferenceFilter": "Ảnh xám có nhiễu giao thoa để liên hệ với bộ lọc.",
     "CreateMotion": "Ảnh xám có chi tiết rõ ràng (ví dụ: văn bản hoặc hình khối).",
-    "CreateDemotion": "Ảnh xám đã bị làm mờ bởi hiệu ứng chuyển động (ví dụ: đầu ra từ CreateMotion)."
+    "CreateDemotion": "Ảnh xám đã bị làm mờ bởi hiệu ứng chuyển động (ví dụ: đầu ra từ CreateMotion).",
+    "CreateDemotionNoise": "Ảnh xám có nhiễu"
 }
 # Ánh xạ tác vụ và file ảnh cho Chapter 9
 CHAPTER9_IMAGE_MAP = {
