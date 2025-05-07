@@ -30,31 +30,6 @@ def Spectrum(imgin):
     imgout = S.astype(np.uint8)
     return imgout
 
-# def Spectrum(imgin):
-#     if len(imgin.shape) > 2 or imgin.dtype != np.uint8:
-#         raise ValueError("Đầu vào phải là ảnh xám (np.uint8)")
-    
-#     # Bước 1: Chuyển sang float32
-#     f = imgin.astype(np.float32)
-    
-#     # Bước 2: Tính FFT 2D
-#     F = np.fft.fft2(f)
-#     F_shifted = np.fft.fftshift(F)
-
-#     # Bước 3: Lấy độ lớn phổ (magnitude spectrum)
-#     magnitude = np.abs(F_shifted)
-
-#     # Bước 4: Dùng log để nén giá trị (có cộng epsilon để tránh log(0))
-#     epsilon = 1e-8
-#     log_magnitude = np.log(1 + magnitude + epsilon)
-
-#     # Bước 5: Chuẩn hóa về khoảng 0-255
-#     log_magnitude_normalized = (log_magnitude - log_magnitude.min()) / (log_magnitude.max() - log_magnitude.min())
-#     spectrum_img = (log_magnitude_normalized * 255).astype(np.uint8)
-    
-#     return spectrum_img
-
-
 def CreateMoireFilter(M, N):
     H = np.ones((M,N), np.complex64)
     H.imag = 0.0
@@ -360,4 +335,10 @@ def CreateDemotionNoise(imgin):
     H = CreateDemotionFilter(M, N)
     img_demotion = FrequencyFiltering(imgin, H)
     imgout = cv2.medianBlur(img_demotion, 5)
+    return imgout
+
+
+def MyCreateDemotionNoise(imgin):
+    # imgout =CreateDemotionNoise(imgin)
+    imgout = cv2.medianBlur(imgin, 5)
     return imgout

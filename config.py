@@ -64,11 +64,12 @@ CHAPTER4_FUNCTIONS = {
     "RemoveMoire": "Loại bỏ nhiễu Moire",
     "RemoveInterference": "Loại bỏ nhiễu giao thoa",
     "RemoveMoireSimple": "Loại bỏ nhiễu Moire (đơn giản)",
-    "RemoveInferenceFilter": "Loại bỏ nhiễu giao thoa (bộ lọc)",
+    # "RemoveInferenceFilter": "Loại bỏ nhiễu giao thoa (bộ lọc)",
     "DrawInferenceFilter": "Vẽ bộ lọc giao thoa",
     "CreateMotion": "Tạo hiệu ứng chuyển động",
     "CreateDemotion": "Khử hiệu ứng chuyển động",
-    "CreateDemotionNoise": "Khử nhiễu chuyển động và làm mịn"
+    # "CreateDemotionNoise": "Khử nhiễu chuyển động và làm mịn",
+    "MyCreateDemotionNoise": "Khử nhiễu chuyển động và làm mịn (tùy chỉnh)"
 }
 # Ánh xạ tác vụ và file ảnh cho Chapter 4
 CHAPTER4_IMAGE_MAP = {
@@ -76,29 +77,33 @@ CHAPTER4_IMAGE_MAP = {
     "RemoveMoire": "4_moire.tif",
     "RemoveInterference": "4_interference.tif",
     "RemoveMoireSimple": "4_moire_simple.tif",
-    "RemoveInferenceFilter": "4_moire_simple.tif",
+    # "RemoveInferenceFilter": "4_moire_simple.tif",
     "DrawInferenceFilter": "4_DrawInferenceFilter.tif",
     "CreateMotion": "4_creat_moire.tif",
     "CreateDemotion": "4_demotion.tif",
-    "CreateDemotionNoise": "4_text_motion_noisy.tif"
+    # "CreateDemotionNoise": "4_text_motion_noisy.tif",
+    "MyCreateDemotionNoise": "4_text_motion_noisy.tif",
 }
 CHAPTER4_IMAGE_DESCRIPTIONS = {
     "Spectrum": "Ảnh xám có họa tiết lặp lại (ví dụ: lưới ô vuông hoặc đường kẻ).",
     "RemoveMoire": "Ảnh xám có nhiễu Moire (ví dụ: ảnh quét từ báo chí hoặc màn hình CRT).",
     "RemoveInterference": "Ảnh xám có nhiễu giao thoa dạng đường thẳng (ví dụ: đường kẻ ngang/dọc).",
     "RemoveMoireSimple": "Ảnh xám có nhiễu Moire nhẹ (ví dụ: ảnh quét từ sách hoặc báo).",
-    "RemoveInferenceFilter": "Ảnh xám có nhiễu giao thoa dạng đường thẳng (tương tự RemoveInterference).",
+    # "RemoveInferenceFilter": "Ảnh xám có nhiễu giao thoa dạng đường thẳng (tương tự RemoveInterference).",
     "DrawInferenceFilter": "Ảnh xám có nhiễu giao thoa để liên hệ với bộ lọc.",
     "CreateMotion": "Ảnh xám có chi tiết rõ ràng (ví dụ: văn bản hoặc hình khối).",
     "CreateDemotion": "Ảnh xám đã bị làm mờ bởi hiệu ứng chuyển động (ví dụ: đầu ra từ CreateMotion).",
-    "CreateDemotionNoise": "Ảnh xám có nhiễu"
+    "CreateDemotionNoise": "Ảnh xám có nhiễu",
+    "MyCreateDemotionNoise": "Ảnh xám có nhiễu và hiệu ứng chuyển động (ví dụ: đầu ra từ CreateMotion)."
 }
 # Ánh xạ tác vụ và file ảnh cho Chapter 9
 CHAPTER9_IMAGE_MAP = {
     "Erosion": "9.1.tif",
     "Dilation": "9.2.tif",
     "Boundary": "9.3.tif",
-    "Counter": "9.4.tif"
+    "Counter": "9.4.tif",
+    "ConnectedComponent": "9.5.tif",
+    "CountRice": "9.6.tif"
 }
 
 CHAPTER9_FUNCTIONS = {
@@ -106,14 +111,18 @@ CHAPTER9_FUNCTIONS = {
     "Erosion": "Xói mòn",
     "Dilation": "Giãn nở",
     "Boundary": "Trích biên",
-    "Counter": "Vẽ đường viền (Contours)"
+    "Counter": "Vẽ đường viền (Contours)",
+    "ConnectedComponent": "Thành phần liên thông",
+    "CountRice": "Đếm hạt gạo"
 }
 
 CHAPTER9_IMAGE_DESCRIPTIONS = {
     "Erosion": "Ảnh nhị phân với vùng sáng rõ (ví dụ: văn bản, hình khối).",
     "Dilation": "Ảnh nhị phân tương tự, để thấy hiệu quả giãn nở.",
     "Boundary": "Ảnh nhị phân với vùng sáng có biên rõ (ví dụ: hình tròn, hình vuông).",
-    "Counter": "Ảnh nhị phân với nhiều đối tượng (để vẽ nhiều đường viền)."
+    "Counter": "Ảnh nhị phân với nhiều đối tượng (để vẽ nhiều đường viền).",
+    "ConnectedComponent": "Ảnh nhị phân với nhiều đối tượng (để đếm số lượng đối tượng).",
+    "CountRice": "Ảnh nhị phân với nhiều hạt gạo (để đếm số lượng hạt gạo)."
 }
 
 # Các hằng số cho nhận dạng trái cây
