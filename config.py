@@ -141,7 +141,13 @@ FRUIT_COLORS = {
     'YELLOW': (0, 255, 255),
     'RED': (0, 0, 255)
 }
-
+# Các hằng số cho nhận diện cảm xúc
+EMOTION_OPTIONS = ["Chọn tác vụ", "Nhận diện từ Webcam", "Nhận diện từ video upload", "Nhận diện từ ảnh upload"]
+EMOTION_CLASSES = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
+EMOTION_EMOJI = {
+    'angry': '😠', 'disgust': '🤢', 'fear': '😨', 'happy': '😄',
+    'neutral': '😐', 'sad': '😢', 'surprise': '😲'
+}
 # Các hằng số khác
 IMAGE_FOLDER_CH3 = "PictureForChapter3"
 IMAGE_FOLDER_CH4 = "PictureForChapter4"

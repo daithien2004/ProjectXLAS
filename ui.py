@@ -1,15 +1,35 @@
 import streamlit as st
+import os
 import cv2
 import numpy as np
-import os
 from config import (
     CHAPTER3_IMAGE_MAP, CHAPTER3_FUNCTIONS, CHAPTER4_FUNCTIONS,
     CHAPTER9_IMAGE_MAP, CHAPTER9_FUNCTIONS, CHAPTER9_IMAGE_DESCRIPTIONS,
-    FACE_OPTIONS, IMAGE_FOLDER_CH3, IMAGE_FOLDER_CH9
+    FACE_OPTIONS, IMAGE_FOLDER_CH3, IMAGE_FOLDER_CH9,EMOTION_CLASSES,EMOTION_OPTIONS,
 )
 import chapter3
 import chapter4
 import chapter9
+
+def on_main_task_change():
+    """Callback function khi main task thay đổi"""
+    main_task = st.session_state.main_task_selector
+    # Reset sub_task khi đổi main_task
+    default_sub_tasks = {
+        "Nhận dạng khuôn mặt": "Nhận dạng từ Webcam",
+        "Nhận dạng trái cây": "Tải lên ảnh",
+        "Xử lý ảnh Chapter 3": "Chọn tác vụ",
+        "Xử lý ảnh Chapter 4": "Chọn tác vụ",
+        "Xử lý ảnh Chapter 9": "Chọn tác vụ",
+        "Nhận diện cảm xúc": "Nhận diện từ Webcam"
+    }
+    st.session_state.sub_task = default_sub_tasks[main_task]
+
+def on_sub_task_change(task_type):
+    """Callback function khi sub task thay đổi"""
+    key = f"{task_type}_sub_task_selector"
+    if key in st.session_state:
+        st.session_state.sub_task = st.session_state[key]
 
 def setup_sidebar():
     """
@@ -29,29 +49,17 @@ def setup_sidebar():
     if 'sub_task' not in st.session_state:
         st.session_state.sub_task = "Nhận dạng từ Webcam"
 
-    # Radio button để chọn tác vụ chính
+    # Radio button để chọn tác vụ chính với callback
     st.sidebar.header("🔍 Chọn loại tác vụ")
     main_task = st.sidebar.radio(
         "Loại tác vụ:",
-        ["Nhận dạng khuôn mặt", "Nhận dạng trái cây", "Xử lý ảnh Chapter 3", "Xử lý ảnh Chapter 4", "Xử lý ảnh Chapter 9"],
-        key="main_task_selector"
+        ["Nhận dạng khuôn mặt", "Nhận dạng trái cây", "Xử lý ảnh Chapter 3",
+         "Xử lý ảnh Chapter 4", "Xử lý ảnh Chapter 9", "Nhận diện cảm xúc"],
+        key="main_task_selector",
+        on_change=on_main_task_change
     )
 
-    # Đồng bộ main_task ngay lập tức
-    if main_task != st.session_state.main_task:
-        st.session_state.main_task = main_task
-        # Đặt sub_task về giá trị mặc định cho main_task mới
-        default_sub_tasks = {
-            "Nhận dạng khuôn mặt": "Nhận dạng từ Webcam",
-            "Nhận dạng trái cây": "Tải lên ảnh",
-            "Xử lý ảnh Chapter 3": "Chọn tác vụ",
-            "Xử lý ảnh Chapter 4": "Chọn tác vụ",
-            "Xử lý ảnh Chapter 9": "Chọn tác vụ"
-        }
-        st.session_state.sub_task = default_sub_tasks[main_task]
-
     # Combobox cho tác vụ chi tiết
-    sub_task = st.session_state.sub_task
     with st.sidebar.container():
         if main_task == "Nhận dạng khuôn mặt":
             st.sidebar.header("🔍 Tác vụ nhận dạng")
@@ -59,7 +67,8 @@ def setup_sidebar():
                 "Chọn tác vụ nhận dạng:",
                 FACE_OPTIONS,
                 index=FACE_OPTIONS.index(st.session_state.sub_task) if st.session_state.sub_task in FACE_OPTIONS else 0,
-                key="face_sub_task_selector"
+                key="face_sub_task_selector",
+                on_change=lambda: on_sub_task_change("face")
             )
         elif main_task == "Nhận dạng trái cây":
             st.sidebar.header("🍎 Tác vụ nhận dạng trái cây")
@@ -67,7 +76,8 @@ def setup_sidebar():
                 "Chọn tác vụ:",
                 ["Tải lên ảnh"],
                 index=0,
-                key="fruit_sub_task_selector"
+                key="fruit_sub_task_selector",
+                on_change=lambda: on_sub_task_change("fruit")
             )
         elif main_task == "Xử lý ảnh Chapter 3":
             st.sidebar.header("🖼️ Tác vụ Chapter 3")
@@ -76,7 +86,8 @@ def setup_sidebar():
                 list(CHAPTER3_FUNCTIONS.keys()),
                 index=list(CHAPTER3_FUNCTIONS.keys()).index(st.session_state.sub_task) if st.session_state.sub_task in CHAPTER3_FUNCTIONS else 0,
                 format_func=lambda x: CHAPTER3_FUNCTIONS[x],
-                key="chapter3_sub_task_selector"
+                key="chapter3_sub_task_selector",
+                on_change=lambda: on_sub_task_change("chapter3")
             )
         elif main_task == "Xử lý ảnh Chapter 4":
             st.sidebar.header("🖼️ Tác vụ Chapter 4")
@@ -85,7 +96,8 @@ def setup_sidebar():
                 list(CHAPTER4_FUNCTIONS.keys()),
                 index=list(CHAPTER4_FUNCTIONS.keys()).index(st.session_state.sub_task) if st.session_state.sub_task in CHAPTER4_FUNCTIONS else 0,
                 format_func=lambda x: CHAPTER4_FUNCTIONS[x],
-                key="chapter4_sub_task_selector"
+                key="chapter4_sub_task_selector",
+                on_change=lambda: on_sub_task_change("chapter4")
             )
         elif main_task == "Xử lý ảnh Chapter 9":
             st.sidebar.header("🖼️ Tác vụ Chapter 9")
@@ -94,14 +106,22 @@ def setup_sidebar():
                 list(CHAPTER9_FUNCTIONS.keys()),
                 index=list(CHAPTER9_FUNCTIONS.keys()).index(st.session_state.sub_task) if st.session_state.sub_task in CHAPTER9_FUNCTIONS else 0,
                 format_func=lambda x: CHAPTER9_FUNCTIONS[x],
-                key="chapter9_sub_task_selector"
+                key="chapter9_sub_task_selector",
+                on_change=lambda: on_sub_task_change("chapter9")
+            )
+        elif main_task == "Nhận diện cảm xúc":
+            st.sidebar.header("😊 Tác vụ nhận diện cảm xúc")
+            sub_task = st.sidebar.selectbox(
+                "Chọn tác vụ nhận diện:",
+                EMOTION_OPTIONS,
+                index=EMOTION_OPTIONS.index(st.session_state.sub_task) if st.session_state.sub_task in EMOTION_OPTIONS else 0,
+                key="emotion_sub_task_selector",
+                on_change=lambda: on_sub_task_change("emotion")
             )
 
-    # Cập nhật sub_task
-    st.session_state.sub_task = sub_task
+    return main_task, st.session_state.sub_task
 
-    return main_task, sub_task
-
+# Phần xử lý ảnh
 def display_image_processing_ui(chapter, task, image_map, functions, image_folder, session_key, image_descriptions=None):
     """
     Hiển thị giao diện xử lý ảnh cho một chapter cụ thể.

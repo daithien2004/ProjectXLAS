@@ -1,31 +1,38 @@
 import streamlit as st
 from config import (
     RTC_CONFIGURATION, CHAPTER3_IMAGE_MAP, CHAPTER3_FUNCTIONS, IMAGE_FOLDER_CH3,
-    CHAPTER4_IMAGE_MAP, CHAPTER4_FUNCTIONS, CHAPTER4_IMAGE_DESCRIPTIONS,IMAGE_FOLDER_CH4,
-    CHAPTER9_IMAGE_MAP, CHAPTER9_FUNCTIONS,
-    CHAPTER9_IMAGE_DESCRIPTIONS, IMAGE_FOLDER_CH9
+    CHAPTER4_IMAGE_MAP, CHAPTER4_FUNCTIONS, CHAPTER4_IMAGE_DESCRIPTIONS, IMAGE_FOLDER_CH4,
+    CHAPTER9_IMAGE_MAP, CHAPTER9_FUNCTIONS, CHAPTER9_IMAGE_DESCRIPTIONS, IMAGE_FOLDER_CH9
 )
 from ui import setup_sidebar, display_image_processing_ui
 from face_recognition import FaceRecognizer
+from emotion_recognition import EmotionRecognizer
 from fruit_recognition import load_fruit_model, process_fruit_recognition
+import os
 
 @st.cache_resource
 def load_face_recognizer():
     return FaceRecognizer()
 
+@st.cache_resource
+def load_emotion_recognizer():
+    return EmotionRecognizer()
+
+@st.cache_resource
+def load_fruit_model_cached():
+    return load_fruit_model()
+
 def main():
     st.set_page_config(page_title="Xử lý ảnh số", layout="wide")
     st.title("📸 ĐỒ ÁN XỬ LÝ ẢNH")
+    with st.spinner("Đang khởi tạo mô hình..."):
+        face_recognizer = load_face_recognizer()
+        emotion_recognizer = load_emotion_recognizer()
+        fruit_model = load_fruit_model_cached()
     st.markdown("---")
 
-    # Thiết lập sidebar
     main_task, sub_task = setup_sidebar()
 
-    # Khởi tạo các mô hình
-    face_recognizer = load_face_recognizer()
-    fruit_model = load_fruit_model()
-
-    # Xử lý giao diện dựa trên tác vụ
     if main_task == "Nhận dạng khuôn mặt" and sub_task != "Chọn tác vụ":
         st.header("🔍 Nhận dạng khuôn mặt")
         if sub_task == "Nhận dạng từ Webcam":
@@ -33,15 +40,35 @@ def main():
             face_recognizer.process_webcam(RTC_CONFIGURATION)
         elif sub_task == "Nhận dạng từ video mẫu":
             st.subheader("🎞️ Nhận dạng từ video mẫu")
-            face_recognizer.process_video("nhandien.mp4")
+            if os.path.exists("nhandien.mp4"):
+                face_recognizer.process_video("nhandien.mp4")
+            else:
+                st.error("File video mẫu 'nhandien.mp4' không tồn tại!")
         elif sub_task == "Nhận dạng từ video upload":
             st.subheader("📤 Nhận dạng từ video upload")
             uploaded_file = st.file_uploader("Tải lên video", type=["mp4", "avi", "mov"])
             if uploaded_file:
                 face_recognizer.process_video(uploaded_file, is_uploaded=True)
 
+    elif main_task == "Nhận diện cảm xúc" and sub_task != "Chọn tác vụ":
+        st.header("😊 Nhận diện cảm xúc")
+        if sub_task == "Nhận diện từ Webcam":
+            st.subheader("📷 Nhận diện từ Webcam")
+            emotion_recognizer.process_webcam(RTC_CONFIGURATION)
+        elif sub_task == "Nhận diện từ video upload":
+            st.subheader("📤 Nhận diện từ video upload")
+            uploaded_file = st.file_uploader("Tải lên video", type=["mp4", "avi", "mov"])
+            if uploaded_file:
+                emotion_recognizer.process_video(uploaded_file, is_uploaded=True)
+        elif sub_task == "Nhận diện từ ảnh upload":
+            st.subheader("🖼️ Nhận diện từ ảnh upload")
+            emotion_recognizer.process_image()
+
     elif main_task == "Nhận dạng trái cây" and sub_task == "Tải lên ảnh":
-        process_fruit_recognition(fruit_model)
+        if fruit_model is not None:
+            process_fruit_recognition(fruit_model)
+        else:
+            st.error("Không thể tải mô hình nhận dạng trái cây. Kiểm tra file trai_cay.onnx.")
 
     elif main_task == "Xử lý ảnh Chapter 3" and sub_task != "Chọn tác vụ":
         display_image_processing_ui(
